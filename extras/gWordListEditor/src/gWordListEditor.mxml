@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+* SPL; AS3 Spelling library for Flash and the Flex SDK. 
+* 
+* Copyright (c) 2013 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+-->
+<mx:WindowedApplication
+	backgroundColor="#666666"
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="vertical" width="100%" height="100%"
+	paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10" creationComplete="init()" invoke="handleInvoke(event);"
+	>
+	<mx:Script>
+		[Embed(source = "assets/flashAssets.swf#fonts")]
+		private var fonts:Class;
+	</mx:Script>
+
+	<mx:Script>
+		<![CDATA[
+			
+			import com.gskinner.spelling.wordlisteditor.events.AddItemEvent;
+			import com.gskinner.spelling.wordlisteditor.events.DialogEvent;
+			import com.gskinner.spelling.wordlisteditor.events.ImportEvent;
+			import com.gskinner.spelling.wordlisteditor.events.SaveEvent;
+			import com.gskinner.spelling.wordlisteditor.events.WordListManagerEvent;
+			import com.gskinner.spelling.wordlisteditor.managers.WordListManager;
+			import com.gskinner.spelling.wordlisteditor.views.AddAffixDialog;
+			import com.gskinner.spelling.wordlisteditor.views.AddWordDialog;
+			import com.gskinner.spelling.wordlisteditor.views.BaseDialog;
+			import com.gskinner.spelling.wordlisteditor.views.HelpDialog;
+			import com.gskinner.spelling.wordlisteditor.views.ImportDialog;
+			import com.gskinner.spelling.wordlisteditor.views.MergeListsDialog;
+			import com.gskinner.spelling.wordlisteditor.views.NoSelectionDialog;
+			import com.gskinner.spelling.wordlisteditor.views.ProcessingDialog;
+			import com.gskinner.spelling.wordlisteditor.views.RemoveItemsDialog;
+			import com.gskinner.spelling.wordlisteditor.views.SaveDialog;
+			import com.gskinner.spelling.wordlisteditor.views.SingleFileDialog;
+			import com.gskinner.spelling.wordlisteditor.views.UnrecognizedFileDialog;
+			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			
+			protected var popUp:BaseDialog;
+			protected var _potentialWords:Array;
+			protected var _potentialAffixes:Array;
+				
+			protected function init():void { registerListeners(); initializeData(); }
+			
+			protected function registerListeners():void {
+				helpBtn.addEventListener(MouseEvent.CLICK, launchHelp, false, 0, true);
+				importBtn.addEventListener(MouseEvent.CLICK, launchImport, false, 0, true);
+				saveBtn.addEventListener(MouseEvent.CLICK, launchSave, false, 0, true);
+				newListBtn.addEventListener(MouseEvent.CLICK, resetData, false, 0, true);
+				addAffixBtn.addEventListener(MouseEvent.CLICK, launchAddAffix, false, 0, true);
+				removeAffixBtn.addEventListener(MouseEvent.CLICK, launchRemoveAffixes, false, 0, true);
+				addWordBtn.addEventListener(MouseEvent.CLICK, launchAddWord, false, 0, true);
+				removeWordBtn.addEventListener(MouseEvent.CLICK, launchRemoveWords, false, 0, true);
+				sortBtn.addEventListener(MouseEvent.CLICK, launchSortWordList, false, 0, true);
+				
+				//var fontList:Array = Font.enumerateFonts(false);
+				//trace("FONTLIST: "+ fontList);
+				//for (var i:uint=0; i<fontList.length; i++) {
+					//trace("font: "+fontList[i].fontName);
+				//}
+				
+				addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER,onDragIn);
+				addEventListener(NativeDragEvent.NATIVE_DRAG_DROP,onDrop);
+				addEventListener(NativeDragEvent.NATIVE_DRAG_EXIT,onDragExit);
+			}
+			
+			protected function onDragIn(p_event:NativeDragEvent):void {
+				NativeDragManager.acceptDragDrop(this);
+			}
+			
+			protected function handleInvoke(event:InvokeEvent):void {
+				var files:Array = event.arguments;
+				var l:uint = files.length;
+				for (var i:uint=0;i<l;i++) {
+					var name:String = files[i];
+					var file:File = event.currentDirectory.resolvePath(name);
+					switch (file.extension){   
+						case "gdic" :
+						case "txt" :
+						case "gspl" :
+						case "zlib":
+							acceptFile(file.nativePath);
+					}
+				}
+			}
+			
+			protected function onDrop(p_event:NativeDragEvent):void {
+			 // DragManager.dropAction = DragActions.COPY;
+                var dropfiles:Array = p_event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+                if(dropfiles.length > 1){
+					popUp = PopUpManager.createPopUp(this, SingleFileDialog, true) as SingleFileDialog;
+					dropfiles = [];
+					return;
+                }
+                
+                for each (var file:File in dropfiles){
+                    switch (file.extension){   
+		                case "gdic" :
+		                case "txt" :
+		                case "gspl" :
+						case "zlib":
+							acceptFile(file.nativePath);
+							break;
+		                default:
+							popUp = PopUpManager.createPopUp(this, UnrecognizedFileDialog, true) as UnrecognizedFileDialog;
+					}
+				}
+			}
+			
+			protected function acceptFile(p_path:String):void {
+				WordListManager.addEventListener(WordListManagerEvent.IMPORTEE_SELECTED, importData);
+				if(Capabilities.os.search("Mac") >= 0){
+					p_path = "file://" + p_path;
+				}
+				WordListManager.acceptFile(p_path);
+			}
+			
+			protected function onDragExit(p_event:NativeDragEvent):void {
+				// trace("Drag exit event.");
+			}
+			
+			
+			protected function initializeData():void {
+				affixDG.dataProvider = new ArrayCollection();
+				wordListDG.dataProvider = new ArrayCollection();
+			}
+			
+			protected function launchAddWord(p_event:MouseEvent):void {
+				popUp = PopUpManager.createPopUp(this, AddWordDialog, true) as AddWordDialog;
+				popUp.addEventListener(AddItemEvent.ADD_ENTRY, addWord, false, 0, true);
+			}
+			
+			protected function launchSortWordList(p_event:MouseEvent):void {
+				popUp = PopUpManager.createPopUp(this, ProcessingDialog, true) as ProcessingDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, sortWordList, false, 0, true);
+			}
+			
+			protected function sortWordList(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, sortWordList);
+				var newData:Array = (wordListDG.dataProvider as ArrayCollection).source.sortOn("label", Array.CASEINSENSITIVE);
+				wordListDG.dataProvider = newData;
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function launchRemoveAffixes(p_event:MouseEvent):void {
+				if (affixDG.selectedItems.length == 0) {
+					popUp = PopUpManager.createPopUp(this, NoSelectionDialog, true) as NoSelectionDialog;
+				} else {
+					var selectedLabels:Array = [];
+					for(var i:uint = 0; i < affixDG.selectedItems.length; i++) {
+						selectedLabels.push(affixDG.selectedItems[i].string);
+					}
+					popUp = PopUpManager.createPopUp(this, RemoveItemsDialog, true) as RemoveItemsDialog;
+					(popUp as RemoveItemsDialog).selectedLabels = selectedLabels;
+					popUp.addEventListener(Event.COMPLETE, removeAffix, false, 0, true);
+				}
+			}
+			
+			protected function launchRemoveWords(p_event:MouseEvent):void {
+				if (wordListDG.selectedItems.length == 0){
+					popUp = PopUpManager.createPopUp(this, NoSelectionDialog, true) as NoSelectionDialog;
+				} else {
+					var selectedLabels:Array = [];
+					for(var i:uint = 0; i < wordListDG.selectedItems.length; i++){
+						selectedLabels.push(wordListDG.selectedItems[i]);
+					}
+					popUp = PopUpManager.createPopUp(this, RemoveItemsDialog, true) as RemoveItemsDialog;
+					(popUp as RemoveItemsDialog).selectedLabels = selectedLabels;
+					popUp.addEventListener(Event.COMPLETE, removeWords, false, 0, true);
+				}
+			}
+			
+			protected function removeAffix(p_event:Event):void {
+				popUp.removeEventListener(Event.COMPLETE, removeAffix);
+				var l:uint = affixDG.selectedIndices.length;
+				for(var i:uint = 0; i < l; i++) {
+					(affixDG.dataProvider as ArrayCollection).removeItemAt(affixDG.selectedIndices[0]);
+				}
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function removeWords(p_event:Event):void {
+				popUp.removeEventListener(Event.COMPLETE, removeWords);
+				var l:uint = wordListDG.selectedIndices.length;
+				for(var i:uint = 0; i < l; i++) {
+					(wordListDG.dataProvider as ArrayCollection).removeItemAt(wordListDG.selectedIndices[0]);
+				}
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function launchAddAffix(p_event:MouseEvent):void {
+				popUp = PopUpManager.createPopUp(this, AddAffixDialog, true) as AddAffixDialog;
+				popUp.addEventListener(AddItemEvent.ADD_ENTRY, addAffix, false, 0, true);
+			}
+	 		
+			protected function addAffix(p_event:AddItemEvent):void {
+				popUp.removeEventListener(AddItemEvent.ADD_ENTRY, addAffix);
+				PopUpManager.removePopUp(popUp);
+				var afx:String = (p_event.prefix == true) ? "PFX" : "SFX";
+				var entry:Object = {string: p_event.entry, type: afx};
+				(affixDG.dataProvider as ArrayCollection).addItem(entry);
+			}
+			
+			protected function addWord(p_event:AddItemEvent):void {
+				popUp.removeEventListener(AddItemEvent.ADD_ENTRY, addWord);
+				PopUpManager.removePopUp(popUp);
+				(wordListDG.dataProvider as ArrayCollection).addItem({label: p_event.entry});
+			}
+			
+			protected function resetData(p_event:MouseEvent):void {
+				affixDG.dataProvider = [];
+				wordListDG.dataProvider = [];
+			}
+			
+			protected function launchSave(p_event:MouseEvent):void {
+				popUp = PopUpManager.createPopUp(this, SaveDialog, true) as SaveDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, saveAvailable, false, 0, true);
+				popUp.addEventListener(SaveEvent.SETTINGS_SELECTED, browseForSave, false, 0, true);
+			}
+			
+			protected function browseForSave(p_event:SaveEvent):void {
+				popUp.removeEventListener(SaveEvent.SETTINGS_SELECTED, browseForSave);
+				PopUpManager.removePopUp(popUp);
+				WordListManager.addEventListener(SaveEvent.DIRECTORY_SELECTED, launchProcessingDialog, false, 0, true);
+				WordListManager.browseForSave(p_event.fileType, p_event.compressed);
+			}
+			
+			protected function launchProcessingDialog(p_event:SaveEvent):void {
+				WordListManager.removeEventListener(SaveEvent.DIRECTORY_SELECTED, launchProcessingDialog);
+				popUp = PopUpManager.createPopUp(this, ProcessingDialog, true) as ProcessingDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, writeFile, false, 0, true);
+			}
+			
+			protected function writeFile(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, writeFile);
+				var l:uint = affixDG.dataProvider.length;
+					var prefixes:Array = [];
+					var suffixes:Array = [];
+					for(var i:uint=0; i<l; i++) {
+						var entry:Object = affixDG.dataProvider[i];
+						if(entry.type == "SFX") {
+							suffixes.push(entry);
+						} else if(entry.type == "PFX") {
+							prefixes.push(entry);
+						}
+					}
+				WordListManager.addEventListener(SaveEvent.SAVED, onFileSaved, false, 0, true)
+				WordListManager.writeFile(prefixes, suffixes, wordListDG.dataProvider);
+			}
+			
+			protected function onFileSaved(p_event:SaveEvent):void {
+				WordListManager.removeEventListener(SaveEvent.SAVED, onFileSaved);
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function saveAvailable(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, saveAvailable);
+			}
+			
+			protected function launchImport(p_event:MouseEvent):void {
+				WordListManager.browseForImport();
+				WordListManager.addEventListener(WordListManagerEvent.IMPORTEE_SELECTED, importData);
+			}
+			
+			protected function importData(p_event:WordListManagerEvent):void {
+				popUp = PopUpManager.createPopUp(this, ImportDialog, true) as ImportDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, importAvailable, false, 0, true);
+				WordListManager.removeEventListener(WordListManagerEvent.IMPORTEE_SELECTED, importData);
+			}
+			
+			protected function importOpenOfficeAffix(p_event:WordListManagerEvent):void {
+				popUp = PopUpManager.createPopUp(this, ImportDialog, true) as ImportDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, openOfficeAffixAvailable, false, 0, true);
+			}
+			
+			protected function launchHelp(p_event:MouseEvent):void {
+				popUp = PopUpManager.createPopUp(this, HelpDialog, true) as HelpDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, helpAvailable, false, 0, true);
+			}
+			
+			protected function helpAvailable(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, helpAvailable);
+			}
+			
+			protected function importAvailable(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, importAvailable);
+				WordListManager.addEventListener(WordListManagerEvent.LIST_DATA_COMLETE, populateLists, false, 0, true);
+				WordListManager.loadWordList();
+			}
+			
+			protected function openOfficeAffixAvailable(p_event:DialogEvent):void {
+				popUp.removeEventListener(DialogEvent.AVAILABLE, importAvailable);
+				WordListManager.addEventListener(WordListManagerEvent.LIST_DATA_COMLETE, populateLists, false, 0, true);
+				WordListManager.loadOpenOfficeAffix();
+			}
+			
+			protected function populateLists(p_event:WordListManagerEvent):void {
+				PopUpManager.removePopUp(popUp);
+				WordListManager.removeEventListener(WordListManagerEvent.LIST_DATA_COMLETE, populateLists);
+				
+				_potentialWords = p_event.wordArray;
+				_potentialAffixes = p_event.affArray;
+				if((affixDG.dataProvider.length > 0) || (wordListDG.dataProvider.length > 0)) {
+					popUp = PopUpManager.createPopUp(this, MergeListsDialog, true) as MergeListsDialog;
+					popUp.addEventListener(ImportEvent.MERGE, launchMerge, false, 0, true);
+					popUp.addEventListener(ImportEvent.CREATE_NEW, createNewList, false, 0, true);
+				} else {
+					affixDG.dataProvider = _potentialAffixes;
+					wordListDG.dataProvider = _potentialWords;
+				}
+			}
+				
+			protected function launchMerge(p_event:ImportEvent):void {
+				popUp.removeEventListener(ImportEvent.MERGE, launchMerge);
+				PopUpManager.removePopUp(popUp);
+				popUp = PopUpManager.createPopUp(this, ProcessingDialog, true) as ProcessingDialog;
+				popUp.addEventListener(DialogEvent.AVAILABLE, startMerge, false, 0, true);
+			}
+				
+			protected function createNewList(p_event:ImportEvent):void {
+				popUp.removeEventListener(ImportEvent.CREATE_NEW, createNewList);
+				affixDG.dataProvider = _potentialAffixes;
+				wordListDG.dataProvider = _potentialWords;
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function startMerge(p_event:DialogEvent):void {
+				
+				popUp.removeEventListener(DialogEvent.AVAILABLE, startMerge);
+			// MERGE WORDS:
+				var i:uint = 0;
+				var currentWords:Array = [];
+				var l:uint = (wordListDG.dataProvider as ArrayCollection).source.length;
+				for(i = 0; i < l; i++) {
+					currentWords.push(((wordListDG.dataProvider as ArrayCollection).source[i]).label);
+				}
+				var potentialWords:Array = [];
+				l = _potentialWords.length;
+				for (i = 0; i < l; i++) {
+					potentialWords.push(_potentialWords[i].label);
+				}
+				potentialWords.sort(Array.CASEINSENSITIVE);
+				currentWords.sort(Array.CASEINSENSITIVE);
+				var newList:Array = WordListManager.mergeLists(potentialWords, currentWords);
+				var finalList:Array = [];
+				l = newList.length;
+				for(i = 0; i < l; i++) {
+					finalList[i] = { label:newList[i] };
+				}
+				wordListDG.dataProvider = finalList;
+			// MERGE AFFIXES:
+				l = (affixDG.dataProvider as ArrayCollection).source.length;
+				var currentAffixes:Array = [];
+				for(i = 0; i < l; i++) {
+					currentAffixes.push((affixDG.dataProvider as ArrayCollection).source[i]);
+				}
+				currentAffixes.sortOn(["string"], Array.CASEINSENSITIVE);
+				_potentialAffixes.sortOn(["string"], Array.CASEINSENSITIVE);
+				var newAffixes:Array = WordListManager.mergeAffixes(currentAffixes, _potentialAffixes);
+				affixDG.dataProvider = newAffixes;
+				PopUpManager.removePopUp(popUp);
+			}
+			
+			protected function browseForOpenOfficeAffix():void {
+				WordListManager.addEventListener(WordListManagerEvent.OPEN_OFFICE_SELECTED, importOpenOfficeAffix);
+				WordListManager.browseForOpenOfficeAffix();
+			}
+			
+			protected function handleSearchInputChange(event:Event):void {
+				var wl:ArrayCollection = (wordListDG.dataProvider as ArrayCollection);
+				var st:String = searchInput.text;
+				var l:uint = st.length;
+				wl.filterFunction = function (item:Object):Boolean {
+					return (st == item.label.toLowerCase().slice(0, l));
+				}
+				wl.refresh();
+			}
+			
+			protected function handleSearchInputFocusIn(event:FocusEvent):void {
+				if (searchInput.getStyle("color") == 0xcccccc) { // Default text.
+					searchInput.text = "";
+					searchInput.setStyle("color", 0x333333);
+				}
+			}
+			
+			protected function handleSearchInputFocusOut(event:FocusEvent):void {
+				if (searchInput.text == "") {
+					searchInput.text = "filter word list";
+					searchInput.setStyle("color", 0xcccccc);
+				}
+			}
+		]]>
+		
+	</mx:Script>
+	
+	<mx:Style source="flex_skins.css"/>
+	
+	<mx:HBox width="100%" verticalAlign="middle" cornerRadius="6" borderStyle="solid" borderThickness="0" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5" backgroundAlpha="0.25" backgroundColor="#FFFFFF" >
+		<mx:Button id = "newListBtn" label="Clear Wordlist "/>
+		<mx:Button id = "importBtn" label="Import…"/>
+		<mx:Button id = "saveBtn" label="Export…"/>
+		<mx:TextInput id="searchInput" width="100%" change="handleSearchInputChange(event)" text="filter word list" color="#cccccc" focusIn="handleSearchInputFocusIn(event)" focusOut="handleSearchInputFocusOut(event)" />
+		<mx:Button id="helpBtn" label="Help" />
+	</mx:HBox>
+	<mx:HBox width="100%" height="100%" paddingLeft="5" paddingRight="5">
+		<mx:VBox width="40%" height="100%" minWidth="170">
+			<mx:HBox width="100%" verticalAlign="middle">
+				<mx:Label text="Affixes" fontSize="16"/>
+				<mx:Spacer width="100%"/>
+				<mx:Button id = "removeAffixBtn" label="-" width = "35"/>
+				<mx:Button id = "addAffixBtn" label="+" width = "35"/>
+			</mx:HBox>
+			<mx:DataGrid width="100%" height="100%" id="affixDG" editable="true" allowMultipleSelection="true">
+				<mx:columns>
+					<mx:DataGridColumn width="75" headerText="Type" editable="true" dataField="type" sortable="true" rendererIsEditor="true" editorDataField="selectedItem" itemRenderer="AffixComboBoxRenderer"/>
+					<mx:DataGridColumn editable="true" headerText="String" dataField="string" sortable="true"/>
+				</mx:columns>
+			</mx:DataGrid>
+			<mx:Label width="100%" textAlign="left" text="{affixDG.dataProvider.length + ' affix entries'}" fontSize="10"/>
+		</mx:VBox>
+		<mx:VBox width="60%" height="100%" minWidth="250">
+			<mx:HBox width="100%" verticalAlign="middle">
+				<mx:Label text="Word List" fontSize="16"/>
+				<mx:Spacer width="100%"/>
+				<mx:Button id = "removeWordBtn" label="-" width = "35"/>
+				<mx:Button id = "addWordBtn" label="+" width = "35"/>
+				<mx:Button id = "sortBtn" label="Sort"/>
+			</mx:HBox>
+			<mx:List width="100%" height="100%" id="wordListDG" allowMultipleSelection="true" editable="true">
+			</mx:List>
+			<mx:HBox width ="100%">
+				<mx:Label width="100%" textAlign="left" text="{wordListDG.dataProvider.length + ' words'}" fontSize="10"/>
+				<mx:Image source="@Embed(source='assets/flashAssets.swf', symbol='logo')" click="browseForOpenOfficeAffix()"/>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:HBox>
+</mx:WindowedApplication>

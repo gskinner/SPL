@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<macromedia-extension name="Spelling Plus Library" version="2.0" type="flashcomponent" requires-restart="true">
+	<!-- Describe the extension -->
+
+	<license-agreement>
+		<![CDATA[Please see the SPL license PDF that was provided to you at the time of purchase.]]>
+	</license-agreement>
+
+	<!-- Describe the author -->
+
+	<author name="gskinner.com" />
+
+	<!-- List the required/compatible products -->
+
+	<products>
+		<product name="Flash" version="11" primary="true" />
+	</products>
+
+	<!-- Describe the extension -->
+	<description>
+		<![CDATA[SPL version 2.0.0
+		
+		Spelling Plus Library (SPL) is a full featured client-side spell checking engine, designed to be used in Flash, Flex and AIR; by both developers and designers. It was built as a best of breed library, with careful attention to architecture, optimization, and extensibility.
+		
+		SPL 2.0 supports the Text Layout Framework (TLF) in Flash Professional CS5 and Flex 4.0.
+		
+		Please read the quick start guide in the SPL > Documentation folder.]]>
+	</description>
+
+	<!-- Describe where the extension shows in the UI of the product -->
+
+	<ui-access>
+		<![CDATA[Window > Components > Spelling Plus Library - TextField (or TLF)]]>
+	</ui-access>
+
+	<!-- Describe the files that comprise the extension -->
+	<files>		
+		<!-- TextField SWCs only CS3 and CS4 -->
+		<file name="TextField_SWCs/SPLAllClasses.swc" destination="$flash/components/Spelling Plus Library - TextField" />
+		<file name="TextField_SWCs/SPLCoreClasses.swc" destination="$flash/components/Spelling Plus Library - TextField" />
+		<file name="TextField_SWCs/SPLCustomWordlistLSO.swc" destination="$flash/components/Spelling Plus Library - TextField" />
+		<file name="TextField_SWCs/SPLTag.swc" destination="$flash/components/Spelling Plus Library - TextField" />
+		<file name="TextField_SWCs/SPLWordListLoader.swc" destination="$flash/components/Spelling Plus Library - TextField" />
+		
+		<!-- TLF SWCs CS5.5 only -->
+		<file name="CS5.5_TLF_SWCs/SPLAllClasses.swc" destination="$flash/components/Spelling Plus Library - TLF" />
+		<file name="CS5.5_TLF_SWCs/SPLCoreClasses.swc" destination="$flash/components/Spelling Plus Library - TLF" />
+		<file name="CS5.5_TLF_SWCs/SPLCustomWordlistLSO.swc" destination="$flash/components/Spelling Plus Library - TLF" />
+		<file name="CS5.5_TLF_SWCs/SPLTag.swc" destination="$flash/components/Spelling Plus Library - TLF" />
+		<file name="CS5.5_TLF_SWCs/SPLWordListLoader.swc" destination="$flash/components/Spelling Plus Library - TLF" />
+		
+	</files>
+	
+</macromedia-extension>

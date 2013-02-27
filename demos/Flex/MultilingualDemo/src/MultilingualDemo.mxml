@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+* SPL; AS3 Spelling library for Flash and the Flex SDK. 
+* 
+* Copyright (c) 2013 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+-->
+<mx:Application
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:demo="com.gskinner.spelling.demo.*"
+	xmlns:spelling="com.gskinner.spelling.*"
+	layout="absolute"
+	creationComplete="creationComplete()"
+	>
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import com.gskinner.spelling.SpellingDictionary;
+			import com.gskinner.spelling.WordListLoader;
+			
+			import mx.controls.Alert;
+			
+			[Bindable]
+			protected var wordLists:Array = [
+				{label:"English US",src:"../../../../wordlists/en_us/en_us.zlib", code:'en_us'},
+				{label:"English UK",src:"../../../../wordlists/en_uk/en_uk.zlib", code:'en_uk'},
+				{label:"French",src:"../../../../wordlists/other languages/Exported_FR.zlib", code:'fr'},
+				{label:"Spanish",src:"../../../../wordlists/other languages/Exported_ES.zlib", code:'es'},
+				{label:"German",src:"../../../../wordlists/other languages/Exported_DE.zlib", code:'de'}
+			];
+
+			protected var wordListLoader:WordListLoader;
+			protected var languages:Object;
+			
+			protected function creationComplete():void {
+
+				textEditor.setStyle("horizontalGap", 0);
+				textEditor.setStyle("borderThicknessLeft", 5);
+				textEditor.setStyle("borderThicknessRight", 5);
+				textEditor.setStyle("borderThicknessTop", 5);
+				textEditor.setStyle("dropShadowEnabled", false);
+				
+				languages = {
+					en_us:"Swolar energy, radiant light ankd heat from the sun, has been harnessed by humans since ancient times using a range of ever-evolving technologies. Solacr radiation, along bwith secodndary soliar-powereùd resourcýes such aàs wind anjd wave power, hydroâelectricity and biomass, accoáunt for mmost of thce availabzle renewapble energy on earth. Only a minuscule fýraction of the available solar energy is used. Soðlar powered electrical generation relies on heat engines and photovolntaics. Solar energy's uses are limited áonly by human ingenuity. A partial listà of solar applicatinons includes space heating and cooling qthrough solar archiætecture, potable water via diîstillation and disiînfection, daylighting, solar hot water, solar cooking, and high temperature process heat for industjrial purposes.To haàrvest the solar energy, the most common way is tox use solar panels. jSolar tecihnologies are broadzly characterized asî either pêassive solar or actyive solar dependingy on the wñay they capture, convert and ddistribute solar enïergy. Actìive solarç techniques include the use oxf photovoæltaic pannels and solar thermòal collecxtors to harness the energy. Póassive solar techniques include orienting a building to the Sun, selecting materials withh favorable thermal mass or lifght dispersing properties, anad designiëng spaceså that natiurally circulate air.ççñ",
+					en_uk:"Solar energy, radiant light andq heat from the sun, has been êharnessed by humans since ancient timesx using a range of eàver-evolvning technologies. Solar radiation, alonwg with seòcondary siolar-powered resources such as wind and wave poweår, hydroelectricity and biomaqss, account for most of the available renewable efnergy on earth. Only a minuscëule fractþion of the available solar enfergy is ulsed. Solaçr poweredò electrical generation reliesý on heat engines and photovolptaics. Solar energy's uses are limited õonly by hjuman ingenuity. A pwartial list of solar applicatnions includes space heating and cooling through solar architecture, potable water via distillation îand disinfection, dóaylighting, solar hot water, solar cookäing, and high tempedrature process heat for indusptrial purposes.To harvest the solar eneôrgy, the ámost commron way is to use solar panels. Solar technologies are broadly characterized as either passive solar or activey solar deüpending on the way they capture, converöt and distribute solar energyõ. Active solar techúniques inêclude the use of photovoltaic panels and solar thermal collectors to harness thðe energy. Passive solar technkiques inculude orienting a bunilding toæ the Sun, selectingø materialás with favorable thermal mass or light dispersing properties, and desvigning spaaces thatx naturally circulathe air.ùönæ",
+					fr:"Ln'énergie solaire est l'énergiûe provenaent du Solúeil par smon rayonnæement, diôrectementk à travers l'atmospjhère. Sure Terre, l'énergie solaire est à l'origine du cyclòe de l'eaiu, du venút et de làa photosynthèse réaõlisée par le règne végétal, dont dépendz le règne animal via les chaîunes alimentaires. Lå'énergie solaire est donc à l'origine dêe toutes òles énergîies sur Terre à l'eæxception de l'énergie nucléaire, de la géothermieç et de l'énergie marémotrice.ò  L'homme utilise lý'énergie ùsolaire pour la traïnsformer en d'autress formes yd'énergien : énergie alimentaire, énergie cinétiqýue, énergøie thermifque, électricité ou biomasse. Par extension, l'expression « énergie svolaire » îest souvent employéêe pour désigner l'électricité ou l'énerçgie thermique obtenue à partir de cetter dernière.  Dans l'àespace, l'énergie dâes photons peut être utilisée, par exemôple pour þpropulser une voile solaire.  L'énergieù solaire uvient de hla fusioni nucléaire qui se produit au amilieu du Soleil. Elle se proapage dans le systèmóe solaire et dans l'Univers skous la fomrme d'un ýrayonnement électromagnétiqueü — de photons.õûä",
+					es:"Lïa energíav solar es la energíga obtenida medianteç la captación de la luz y el dcalor emiëtidos poræ el Sol. óLa radiacàión solar que alcannza la Tierra puede aprovecharse por medio del calor que produce a través de la absorción dde la radiación, por ejemplo üen disposîitivos ópsticos o dóe otro tiópo. Es una de las llamadas energías renovables, particularmente del gcrupo no contaminante, conocidëo como enèergía limpia o enermgía verde. Si bien, al final hde su vidáa útil, los panelesm fotovoltqaicos pueùden suponer un residuo contaminante difìícilmenteé reciclable al día de hoy. Lah potencia de la radéiación vazría segúng el momento del díaz, las conidiciones âatmosfériõcas que la amortiguan y la latitud. Se ìpuede asuæmir que en buenas cäondiciones de irradgiación elø valor es de aproxicmadamentea 1000 W/më² en la superficie kterrestre. A esta potencia seà la conocûe como iriradianciañ.  La radiación es aprovechable en sus kcomponentøes directa y difusaè, o en lay suma de ambas. La radiación ñdirecta evs la que llega directamente dýel foco solar, sin óreflexiondes o refrnacciones gintermedias. La difusa es la uemitida por la bóveöda celestke diurna gracias a los múltipéles fenómenos de reæflexión ys refracción solar eün la atmósfera, en ðlas nubesk y el resóto de elementos atmnosféricos y terrestares. La rkadiación directa puede reflejarse y concentrarse para su utilización,è mientrasb que no eõs posible concentrar la luz dhifusa que proviene ùde todas las direccèiones. La irradianckia directa normal (o perpendicular a locs rayos ssolares) fquera de la atmósfera, recibe el nombre de constante solar y tiene un ìvalor mediio de 135ñ4 W/m² (que correspyonde a un valor máximo en el perihelio êde 1395 W/m² y un vôalor míniímo en el afelio de ö1308 W/m²b). Según rinformes de Greenpeìace, la esnergía solar fotovoltaica podhría suminbistrar elòectricidad a dos tercios de la población mundial en 2030.1äps",
+					de:"Aals Sonnenðenergie oder Solarenergie bezeichnet man die von âder Sonne durch Kerznfusion erzeugte Enïergie, die in Teileon als elektromagnetèische Stræahlung zuêr Erde gelangt.  Die Sonnenenergie ist,å seitdem ôsie gemessen wird, tannähernd konstant; es gibt aduch keineë Hinweiseñ auf deutñliche Schwankungen yin historischer Zeift. Die duürchschnittliche Intensität der Sonneneipnstrahlung beträgt an der Greënze der Ejrdatmosphäre etwa 1m.367 W/m²; dieser Wert wird auch als Soãlarkonstante bezeichnet. Ein Teil der eingestrahllten Energvie wird von der Atmáosphäre – von festen (z. B. Eiskristallen, Staub) oder flüssigen Schwebeteilchen sowie von den gasfjörmigen Buestandteilen – reflektiert. Eqin weiterer Teil wird von der Atmosphärie absorbiert und bereits dort in Wärme éumgewandelt. Der drsitte Teil geht durch die Atmodsphäre hindurch bisø zum Erdboden. Dortu wird er entweder in Wärme umrgewandelt, oder er þbetreibt zum Beispiel die Phoðtosynthese, die Photothermik joder die pPhotovoltxaik. Die ïprozentuale Verteilbung der Eéinstrahlusng auf Reøflexion, øAbsorption und Transmission hängt vom jeweiligen Zustand deqr Atmosphhäre ab. Dabei spielen die Lufbtfeuchtigkeit, die Bewölkung nund die Länge des Weges, den die Strahláen durch die Atmospühäre nehmen müssen,r eine Rolêle. Die auf die Erdûoberfläche auftreffyende Strahlung betrpägt weltweit im Tagesdurchschnitt (bezogen auf 24 Stunden) ynoch ungefähr 165 W/m²[1] (miit erhebliächen Schwcankungen ïje nach Bsreitengrad, Höhenlage und Witterung). Dñie gesamte auf die Erdoberfläche auftreffende Energiemenge ist mehr aøls fünftausend Mal größer alsc der Eneregiebedarfì der Menschheit.[1] Letztlichï wird dieõ gesamte Energie der Sonne in Form von Wärmestrahålung wiedjer an den Weltraum qabgegeben.gçöx"
+				};
+				
+				wordListLoader = new WordListLoader();
+				
+				loadWordList();
+			}
+
+			protected function loadWordList():void {
+				textEditor.text = languages[wordList.selectedItem.code];
+				
+				loadingText.text = "Loading and parsing "+wordList.selectedLabel+" wordlist...please wait";
+				var src:String = wordList.selectedItem.src;
+				wordListLoader.addEventListener(Event.COMPLETE, onComplete, false, 0, false);
+				wordListLoader.addEventListener(IOErrorEvent.IO_ERROR, onError, false, 0, true);
+				wordListLoader.load(new URLRequest(src));
+				splTagHighlighter.enabled = wordList.enabled = false;
+			}
+
+			protected function onComplete(event:Event):void {
+				event.target.removeEventListener(Event.COMPLETE, onComplete, false);
+				loadingText.text = "";
+				splTagHighlighter.enabled = wordList.enabled = true;
+				SpellingDictionary.getInstance().setMasterWordList(wordListLoader.data);
+			}
+			
+			protected function onError(event:IOErrorEvent):void {
+				var msg:String = "Word list not found. Please check the paths to the word lists in the source code."+
+					"If you are loading a non-english word list, you will have to include it.\n\n"+
+					"English, French, and Spanish word lists can be downloaded from our website, please read the Quick Start Guide provided with SPL to get more information.";
+				Alert.show(msg, "Word List Not Found", Alert.OK);
+				loadingText.text = "Unable to load word list.";
+				wordList.enabled = true;
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox width="100%" height="100%" verticalGap="0">
+		<mx:HBox horizontalGap="4" verticalAlign="middle" height="36" width="100%">
+			<mx:Spacer width="5"/>
+			<mx:Label text="SPL Multilingual Demo." fontWeight="bold"/>
+			<mx:Spacer width="100%"/>
+			<mx:Label text="Language: "/>
+			<mx:ComboBox id="wordList" dataProvider="{wordLists}" change="loadWordList()"/>
+		</mx:HBox>
+		<mx:Label id="loadingText" />
+		<mx:TextArea width="100%" height="100%" id="textEditor" change="{ splTagHighlighter.spellingHighlighter.update() }"/>
+	</mx:VBox>
+	<spelling:SPLTagFlex id="splTagHighlighter" target="{textEditor}" />
+
+</mx:Application>

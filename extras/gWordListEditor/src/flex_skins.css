@@ -1,0 +1,181 @@
+Application {
+	backgroundColor: #000000;
+	backgroundGradientColors: #333333, #999999;
+	backgroundGradientAlphas: 1, 0.32;
+	themeColor: #333333;
+	color: #ffffff;
+}
+
+Button {
+	cornerRadius: 4;
+	letterSpacing: 0;
+	highlightAlphas: 0.3, 0.04;
+	fillAlphas: 0.72, 0.79, 1, 1;
+	fillColors: #333333, #333333, #333333, #333333;
+	color: #ffffff;
+	textRollOverColor: #ffffff;
+	textSelectedColor: #ffffff;
+	borderColor: #ffffff;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Demi BT";
+	fontSize: 12;
+}
+
+HScrollBar {
+	fillColors: #333333, #333333, #ffffff, #cccccc;
+	trackColors: #666666, #999999;
+	borderColor: #666666;
+}
+
+VScrollBar {
+	fillColors: #333333, #333333, #ffffff, #cccccc;
+	trackColors: #666666, #999999;
+	borderColor: #666666;
+}
+
+ComboBox {
+	cornerRadius: 3;
+	color: #ffffff;
+	borderColor: #333333;
+	highlightAlphas: 0.42, 0;
+	fillAlphas: 0.72, 0.4, 0.75, 0.65;
+	fillColors: #333333, #333333, #333333, #333333;
+	backgroundAlpha: 1;
+	textSelectedColor: #ffffff;
+	themeColor: #333333;
+	openDuration: 316;
+	closeDuration: 316;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Demi BT";
+	fontSize: 12;
+	dropDownStyleName: "myComboBoxDropDowns";
+}
+
+.myComboBoxDropDowns {
+	borderColor: #333333;
+	color: #333333;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+}
+
+Panel {
+	borderColor: #333333;
+	borderThicknessLeft: 10;
+	borderThicknessTop: 5;
+	borderThicknessBottom: 10;
+	borderThicknessRight: 10;
+	roundedBottomCorners: true;
+	cornerRadius: 6;
+	headerHeight: 23;
+	backgroundAlpha: 1;
+	highlightAlphas: 0.3, 0;
+	headerColors: #333333, #333333;
+	backgroundColor: #666666;
+	dropShadowEnabled: true;
+	modalTransparencyColor: #666666;
+	titleStyleName: "mypanelTitle";
+}
+
+.mypanelTitle {
+	color: #ffffff;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Demi BT";
+	fontSize: 12;
+}
+
+TitleWindow {
+	borderColor: #666666;
+	borderThicknessLeft: 10;
+	borderThicknessTop: 5;
+	borderThicknessBottom: 10;
+	borderThicknessRight: 10;
+	roundedBottomCorners: true;
+	cornerRadius: 6;
+	headerHeight: 23;
+	backgroundAlpha: 1;
+	highlightAlphas: 0.3, 0;
+	headerColors: #666666, #666666;
+	backgroundColor: #666666;
+	dropShadowEnabled: true;
+	titleStyleName: "mypanelTitle";
+}
+
+List {
+	backgroundAlpha: 1;
+	alternatingItemColors: #5c5c5c, #525252;
+	textRollOverColor: #333333;
+	color: #cccccc;
+	textSelectedColor: #333333;
+	dropShadowEnabled: true;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+	borderColor: #999999;
+}
+
+DataGrid {
+	backgroundColor: #333333;
+	alternatingItemColors: #5c5c5c, #525252;
+	headerColors: #333333, #333333;
+	horizontalGridLines: false;
+	verticalGridLines: true;
+	textRollOverColor: #333333;
+	borderColor: #999999;
+	color: #cccccc;
+	textSelectedColor: #333333;
+	dropShadowEnabled: true;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+	headerStyleName: "mydataGridHeaderStyle";
+}
+
+.mydataGridHeaderStyle {
+	color: #ffffff;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Demi BT";
+	fontSize: 12;
+	textRollOverColor: #333333;
+}
+
+RadioButton {
+	highlightAlphas: 1, 0.3;
+	fillColors: #ffffff, #ffffff, #ffffff, #eeeeee;
+	color: #cccccc;
+	textSelectedColor: #ffffff;
+	textRollOverColor: #ffffff;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+}
+
+Label {
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Demi BT";
+	fontSize: 12;
+	backgroundColor: #000000;
+}
+
+TextArea {
+	color: #ffffff;
+	backgroundAlpha: 0.5;
+	backgroundColor: #666666;
+	borderThickness: 0;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+}
+
+TextInput {
+	color: #333333;
+	backgroundColor: #ffffff;
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+}
+
+Text {
+	fontWeight: normal;
+	fontFamily: "Franklin Gothic ITC Book BT";
+	fontSize: 12;
+}

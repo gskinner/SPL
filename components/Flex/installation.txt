@@ -1,0 +1,1 @@
+Please read the SPL Quick Start guide in the docs folder for installation instructions.

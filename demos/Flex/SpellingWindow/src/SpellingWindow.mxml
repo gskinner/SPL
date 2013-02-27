@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+* SPL; AS3 Spelling library for Flash and the Flex SDK. 
+* 
+* Copyright (c) 2013 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+-->
+<mx:Application
+	applicationComplete="init()"
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute" xmlns:spelling="com.gskinner.spelling.*"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	>
+
+	<mx:Script>
+		<![CDATA[
+			import com.gskinner.spelling.views.SPLWindow;
+			import com.gskinner.text.TextHighlighter;
+			import mx.managers.PopUpManager;
+			
+			protected var spellWindow:SPLWindow;
+
+			protected var sparkTextAreaHighlight:TextHighlighter;
+
+			protected function init():void {
+				var sampleTextLoader:URLLoader = new URLLoader();
+				sampleTextLoader.addEventListener(Event.COMPLETE, onTextLoad, false, 0, true);
+				sampleTextLoader.load(new URLRequest('data/sampleText.txt'));
+
+				spellWindow = new SPLWindow();
+			}
+
+			protected function onTextLoad(p_event:Event):void {
+				sampleText.text = p_event.target.data;
+			}
+			
+			protected function checkSpelling():void {
+				PopUpManager.addPopUp(spellWindow, this, true);
+				PopUpManager.centerPopUp(spellWindow);
+
+				spellWindow.checkSpelling(sampleText);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<spelling:SPLWordListLoader url="../../../../wordlists/en_us/en_us.zlib" />
+	
+	<s:Panel title="Sample Text Area (MX Component)" width="100%" height="100%" dropShadowVisible="false">
+		<mx:VBox width="100%" height="100%">
+			<mx:TextArea id="sampleText" width="100%" height="100%" />
+			<mx:Button id="checkSpellingBtn" label="Check Spelling" click="checkSpelling()" />
+			<mx:Spacer height="2"/>
+		</mx:VBox>
+	</s:Panel>
+
+</mx:Application>

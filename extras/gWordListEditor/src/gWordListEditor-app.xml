@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/3.4">
+
+	<id>gWordListEditor</id>
+	<filename>gWordListEditor</filename>
+	<name/>
+	<versionNumber>1.0.0</versionNumber>
+	<copyright>gskinner.com Inc.</copyright>
+
+	<initialWindow>
+		<content>[This value will be overwritten by Flex Builder in the output app.xml]</content>
+		<visible>true</visible>
+		<width>650</width>
+		<height>450</height>
+		<minSize>200 200</minSize>
+	<autoOrients>false</autoOrients>
+        <fullScreen>false</fullScreen>
+    </initialWindow>
+	
+	<fileTypes>
+	
+		<fileType>
+			<name>SPL.dictionary</name>
+			<extension>gdic</extension>
+			<contentType>text/plain</contentType>
+			<description>gskinner.com spelling dictionary file.</description>
+		</fileType>
+		
+		<fileType>
+			<name>SPL.dictionary</name>
+			<extension>gspl</extension>
+			<contentType>multipart/mixed</contentType>
+			<description>gskinner.com spelling dictionary file.</description>
+		</fileType>
+		
+	</fileTypes>
+
+</application>
